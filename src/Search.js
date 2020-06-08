@@ -6,7 +6,8 @@ import './App.css'
 class SearchForm extends Component {
  
 render () {
-
+  const { none, currentlyReading, wantToRead, read} = this.props.shelves;
+  
     return (
       <div className="search-books">
       <div className="search-books-bar">
@@ -21,10 +22,24 @@ render () {
         <input type="text" placeholder="Search by title or author" onChange={this.props.handleSearch}/>
         </div>
       </div>
-      {/* {this.props.myshelves ? ( */}
+    
       <div className="search-books-results">
-        
-     <Bookshelf name="Search Results" books={this.props.searchResults} changeShelf={this.props.changeShelf} shelfname="none"/>
+        {none && (
+          <Bookshelf name="Search Results" books={none} changeShelf={this.props.changeShelf} shelfname="none"/>
+        )}
+
+        {currentlyReading && (
+          <Bookshelf name="Currently Reading" books={currentlyReading} changeShelf={this.props.changeShelf} shelfname="currentlyReading"/>
+        )}
+
+        {wantToRead && (
+          <Bookshelf name="Want to Read" books={wantToRead} changeShelf={this.props.changeShelf} shelfname="wantToRead"/>
+        )}
+
+        {read && (
+          <Bookshelf name="Read" books={read} changeShelf={this.props.changeShelf} shelfname="read"/>
+        )}
+     
     
       </div>
       

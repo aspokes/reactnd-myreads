@@ -60,20 +60,42 @@ class BooksApp extends React.Component {
    }
 
   groupSearchBooks(books){  
-    let searchShelves = {
-      currentlyReading : {} ,
-      wantToRead : {},
-      read : {},
-      none : {}
-    };
+    const none = [];
+    const currentlyReading = [];
+    const wantToRead = [];
+    const read = [];
    
-    let bl = Object.keys(books).map((key) => {
-      
-      return searchShelves[books[key].shelf] = [...searchShelves[books[key].shelf], books[key]];
-    });
-    console.log(bl);
+    for (let key in books){
+      if(books.hasOwnProperty(key)){
+         
+          switch (books[key].shelf){
+           case 'currentlyReading':
+            currentlyReading.push(books[key]);
+           break;
+           case 'wantToRead':
+            wantToRead.push(books[key]);
+          break;
+          case 'read':
+            read.push(books[key]);
+           break;
+          default:
+            none.push(books[key]);
+            
+          break;
+            
+          }
+       
+      }
 
-    this.setState({ searchShelves : searchShelves});
+    }
+   
+    this.setState({ 
+      none : none,
+      currentlyReading : currentlyReading,
+      wantToRead : wantToRead,
+      read : read,
+      searchResults: books
+    });
     
   }
 
@@ -94,14 +116,17 @@ class BooksApp extends React.Component {
     Object.keys(results).map((key) => {
       
       if(results[key].id === bookid){ 
+        
         results[key].shelf = newshelf;
+        
         books[books.length] = results[key];   
-        delete results[key];
+        
       }
       return key;
     });
       
     this.setState({ searchResults : results });
+    this.groupSearchBooks(results);
     this.sendToShelf(books);
     return books;
     }
@@ -144,12 +169,18 @@ class BooksApp extends React.Component {
   }
 
   render() {
-   
+   const { none, currentlyReading, wantToRead, read} = this.state;
     
     return (
       <div className="app">
         <Route exact path='/search' render={(props) => (
-          <SearchForm {...props} handleSearch={this.handleSearch} searchResults={this.state.searchShelves} changeShelf={this.changeSearchShelf} countResults={this.state.countResults}/>
+          <SearchForm 
+            {...props} 
+            handleSearch={this.handleSearch} 
+            shelves={{none, currentlyReading, wantToRead, read}} 
+            changeShelf={this.changeSearchShelf} 
+            countResults={this.state.countResults}
+          />
          )} />
          <Route exact path='/' render={() => (
           <div className="list-books">
@@ -164,7 +195,7 @@ class BooksApp extends React.Component {
               </div>
             </div>
             <div className="open-search">
-              {/* <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a> */}
+            
               <Link
                 to='/search'                           
               >

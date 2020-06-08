@@ -4,7 +4,7 @@ import Book from './Book'
 class Bookshelf extends Component {
 
   render() {
-    // console.log(this.props);
+  
       const { name, books, changeShelf, shelfname } = this.props;
      
     return (
