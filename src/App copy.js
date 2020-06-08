@@ -12,7 +12,8 @@ class BooksApp extends React.Component {
 
     this.changeShelf = this.changeShelf.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
-    this.changeSearchShelf = this.changeSearchShelf.bind(this);
+    this.searchchangeShelf = this.searchchangeShelf.bind(this);
+    this.sendToSearchShelf = this.sendToSearchShelf.bind(this);
   }
 
   state = {
@@ -30,10 +31,12 @@ class BooksApp extends React.Component {
     },
     books : {},
     searchResults: {},
-    searchShelves: {
-      
-    },
-    countResults: 0
+    myshelves: {
+      currentlyReading : {} ,
+      wantToRead : {},
+      read : {},
+      none : {}
+    }
   }
 
   componentDidMount() {
@@ -44,40 +47,18 @@ class BooksApp extends React.Component {
   }
 
    handleSearch(event){
+    
      const item = event.target.value;
      this.setState({searchitem : item});
-
+     
      BooksAPI.search(item, 20)
-     .then((response) => {
-       if(response){
-         this.groupSearchBooks(response);
-        this.setState(() => ({countResults: response.length, searchResults : response}));
-       }else{
-        this.setState(() => ({countResults: 0}));
-       }
-      
+     .then((response) => {      
+      // this.setState({searchResults : response});
+      this.sendToSearchShelf(response);
      });
    }
 
-  groupSearchBooks(books){  
-    let searchShelves = {
-      currentlyReading : {} ,
-      wantToRead : {},
-      read : {},
-      none : {}
-    };
-   
-    let bl = Object.keys(books).map((key) => {
-      
-      return searchShelves[books[key].shelf] = [...searchShelves[books[key].shelf], books[key]];
-    });
-    console.log(bl);
-
-    this.setState({ searchShelves : searchShelves});
-    
-  }
-
-  changeSearchShelf(...vs){  
+  searchchangeShelf(...vs){  
     
     BooksAPI.update({id : vs[0]}, vs[1])
       .then((response) => {
@@ -92,7 +73,6 @@ class BooksApp extends React.Component {
     
     
     Object.keys(results).map((key) => {
-      
       if(results[key].id === bookid){ 
         results[key].shelf = newshelf;
         books[books.length] = results[key];   
@@ -101,9 +81,26 @@ class BooksApp extends React.Component {
       return key;
     });
       
-    this.setState({ searchResults : results });
+    this.sendToSearchShelf(results);
     this.sendToShelf(books);
     return books;
+    }
+
+    sendToSearchShelf(myresults){  
+      console.log(myresults.length);
+      let myshelves = {
+        currentlyReading : {} ,
+        wantToRead : {},
+        read : {},
+        none : {}
+      };
+  
+      Object.keys(myresults).map((key) => {
+        
+        return myshelves[myresults[key].shelf] = [...myshelves[myresults[key].shelf], myresults[key]];
+      });
+    
+      this.setState({ myshelves : myshelves, searchResults: myresults });
     }
 
   changeShelf(...vs){  
@@ -149,7 +146,8 @@ class BooksApp extends React.Component {
     return (
       <div className="app">
         <Route exact path='/search' render={(props) => (
-          <SearchForm {...props} handleSearch={this.handleSearch} searchResults={this.state.searchShelves} changeShelf={this.changeSearchShelf} countResults={this.state.countResults}/>
+          
+          <SearchForm {...props} handleSearch={this.handleSearch} myResults={this.state.myshelves} changeShelf={this.searchchangeShelf}/>
          )} />
          <Route exact path='/' render={() => (
           <div className="list-books">

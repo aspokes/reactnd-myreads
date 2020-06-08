@@ -1,22 +1,20 @@
 import React, { Component } from 'react';
 import Book from './Book'
 
-class Bookshelf extends Component {
+class Bookshelfsearch extends Component {
 
   render() {
-    // console.log(this.props);
       const { name, books, changeShelf, shelfname } = this.props;
-     
+      console.log(this.props)
     return (
         <div className="bookshelf">
         <h2 className="bookshelf-title">{name}</h2>
         <div className="bookshelf-books">
           <ol className="books-grid">
             
-              {Object.keys(books).map((key) => (
-                  <Book key={key} book={books[key]} changeShelf={changeShelf} shelfname={shelfname}/>
-                   
-                ))}
+              
+                  <Book book={books.id} changeShelf={changeShelf} shelfname={shelfname}/>
+                
               
             
           </ol>
@@ -26,4 +24,4 @@ class Bookshelf extends Component {
   }
 }
 
-export default Bookshelf;
+export default Bookshelfsearch;
